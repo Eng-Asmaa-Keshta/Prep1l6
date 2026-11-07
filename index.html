@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>قلعة السحاب – Cloud Quest</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1535;--bg2:#2a1a5e;--card:#1b2455;--acc:#ffd166;--ok:#2ecc71;--bad:#ff5d6c;--tx:#f3f5ff;--mut:#aab3e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:linear-gradient(160deg,var(--bg),var(--bg2));color:var(--tx);font-family:Tahoma,"Segoe UI",Arial,sans-serif;display:flex;justify-content:center}
+#app{width:100%;max-width:560px;padding:12px}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:17px;padding:8px 4px}
+.map{display:flex;justify-content:center;gap:8px;margin-bottom:8px}
+.map i{font-style:normal;width:38px;height:38px;border-radius:50%;background:#ffffff14;display:grid;place-items:center;font-size:19px;opacity:.45}
+.map i.d{background:var(--ok);opacity:1}.map i.c{background:var(--acc);opacity:1;box-shadow:0 0 12px var(--acc)}
+.c{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 6px 24px #0006}
+.ctr{text-align:center}
+.big{font-size:64px;line-height:1.1}
+h1{margin:6px 0;color:var(--acc)}h2{margin:6px 0}
+p{line-height:1.7;color:var(--mut);margin:8px 0}
+input{width:100%;padding:13px;border-radius:12px;border:2px solid #ffffff33;background:#0003;color:var(--tx);font-size:18px;text-align:center;margin:10px 0;font-family:inherit}
+.b{display:block;width:100%;margin:10px 0 0;padding:14px;border:0;border-radius:14px;background:linear-gradient(180deg,#ffd166,#f9a826);color:#2a1a00;font-size:19px;font-weight:800;cursor:pointer;text-decoration:none;font-family:inherit}
+.b.wa{background:linear-gradient(180deg,#34d97b,#1faa59);color:#04210f}
+.qc{background:#0003;border-radius:14px;padding:16px;font-size:19px;font-weight:700;direction:ltr;text-align:left;margin:8px 0 12px;line-height:1.5}
+.qc.s{text-align:center;font-size:26px;color:var(--acc)}
+.og{display:grid;gap:10px}
+.og.g2{grid-template-columns:1fr 1fr}
+.o{padding:13px;border-radius:12px;border:2px solid #ffffff2a;background:#ffffff10;color:var(--tx);font-size:17px;cursor:pointer;direction:ltr;text-align:left;font-family:inherit}
+.og.g2 .o{text-align:center;direction:rtl}
+.o:disabled{opacity:.3}
+.o.ok{background:var(--ok);color:#04210f;border-color:var(--ok)}
+.o.bad{background:var(--bad);border-color:var(--bad)}
+.tb{height:10px;background:#0004;border-radius:9px;overflow:hidden}.tb b{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--bad),var(--acc),var(--ok))}
+.pw{display:flex;gap:8px;margin-top:12px}.pw button{flex:1;padding:10px;border-radius:10px;border:0;background:#ffffff1c;color:var(--tx);font-size:15px;font-family:inherit}
+.vil{display:flex;align-items:center;gap:10px;font-size:38px;margin-bottom:6px}.hp{flex:1;height:16px;background:#0005;border-radius:9px;overflow:hidden}.hp b{display:block;height:100%;background:var(--bad);transition:width .4s}
+.st{font-size:42px}.sc{font-size:46px;color:var(--acc);font-weight:900;margin:0}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.cf{position:fixed;top:-30px;font-size:26px;animation:fl 3s linear forwards;pointer-events:none}@keyframes fl{to{transform:translateY(110vh) rotate(360deg)}}
+small{color:var(--mut)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),A=$('#app');
+const sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+// [question, correct, wrong, wrong, wrong]
+const M=[
+["Cloud computing is a model for providing ____ over the Internet.","digital services","presentations","Google Docs","Google Classroom"],
+["Which one is a requirement of cloud computing services?","An Internet browser","A printer","INSTAPAY","A game console"],
+["We use cloud word processing programs such as ____","Google Docs","Google Sheets","Google Classroom","Google Cloud Platform"],
+["We use cloud spreadsheets such as ____","Google Sheets","Google Docs","Google Classroom","Google Meet"],
+["Which feature protects data from loss if a device is damaged?","Data backup","Video games","Online shopping","Social networking"],
+["What is the FIRST step in cloud data processing?","Data collection","Data storage","Data management","Data access"],
+["Cloud storage service is used for ____","storing files and folders over the Internet","storing files only on the computer","printing documents","browsing websites"],
+["Which is a famous cloud computing service provider?","Google Cloud Platform","Facebook Platform","YouTube Platform","Paint"],
+["Which one is a cloud collaboration tool?","Google Classroom","Calculator","Notepad","Paint"],
+["Cloud data processing and storage occur in ____","cloud data centers","personal computers","local devices","printers"],
+["Cloud computing in healthcare is used to ____","store medical records","transfer money","play video games","stream music"],
+["We use online banking to ____","transfer money and pay bills","watch movies","write documents","play music"],
+["Cloud computing reduces costs by ____","eliminating the need for high-specification devices","requiring expensive hardware","requiring software licenses","increasing hardware costs"],
+["Which one is a cloud storage service?","Google Drive","Gmail","Google Sheets","WhatsApp"],
+["Which is a cloud-based word processing program?","Microsoft Word Online","Adobe Photoshop","Paint","Calculator"]];
+const TF=[
+["Cloud computing is a model for providing digital services over the Internet.",1],
+["An Internet connection is required to access cloud computing services.",1],
+["Cloud storage means storing files and folders locally on the computer.",0],
+["Gmail, Outlook, and Yahoo Mail are examples of cloud email services.",1],
+["Facebook and Instagram do not use cloud computing.",0],
+["Cloud computing cannot be used for data backup.",0],
+["Cloud computing is not used in healthcare services.",0],
+["Amazon Web Services, Microsoft Azure, and Google Cloud Platform are famous cloud providers.",1],
+["Data can be accessed in cloud computing without the Internet.",0],
+["To obtain cloud computing services, you create an account with a service provider.",1]];
+const C=['📨 Communication','💾 Storage','📝 Projects','🎬 Entertainment'];
+const SO=[["Gmail",0],["WhatsApp",0],["Facebook",0],["Google Drive",1],["OneDrive",1],["Data backup",1],["Google Docs",2],["Google Sheets",2],["Microsoft Teams",2],["YouTube",3],["Online video games",3],["Cloud music",3]];
+const ST=["Data Collection","Data Transfer to cloud data centers","Data Processing on powerful servers","Data Storage on high-capacity units","Data Management by database systems","Data Access through the Internet"];
+const LV=[
+{n:'بوابة القلعة',e:'🏰',s:'البوابة مقفولة بالسحر! جاوب على 5 أسئلة اختيار من متعدد عشان تفتحها.'},
+{n:'جسر الصح والغلط',e:'🌉',s:'الجسر بيقع تحت رجلك لو جاوبت غلط. اختار صح ✅ أو غلط ❌ بسرعة!'},
+{n:'غرفة المفاتيح',e:'🗝️',s:'كل خدمة معاها مفتاح. ودّي كل خدمة للمجال بتاعها عشان تاخد المفتاح.'},
+{n:'برج الخطوات',e:'⚙️',s:'السلم متلخبط! رتّب خطوات معالجة وتخزين البيانات في السحابة من الأول للآخر.'},
+{n:'معركة الهاكر الأسود',e:'👾',s:'وصلت لآخر الطريق! الهاكر الأسود حارس الكنز. كل إجابة صح بتضربه ضربة، وكل غلطة بتخسرك قلب.'}];
+let S,ac,tm;
+function snd(f,d=.12,t='sine'){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+const ok=()=>{snd(660);setTimeout(()=>snd(880),90)},no=()=>snd(180,.3,'sawtooth');
+const hud=()=>`<div class="hud"><span>${'❤️'.repeat(S.lives)}${'🖤'.repeat(3-S.lives)}</span><span>${LV[S.lv].e} ${S.lv+1}/5 ${S.streak>1?'🔥x'+S.streak:''}</span><span>⭐ ${S.score}</span></div><div class="map">${LV.map((l,i)=>`<i class="${i<S.lv?'d':i==S.lv?'c':''}">${l.e}</i>`).join('')}</div>`;
+function home(){A.innerHTML=`<div class="c ctr"><div class="big">🏰☁️</div><h1>قلعة السحاب</h1><p>الهاكر الأسود سرق كنز السحابة وقفل القلعة! حل التحديات، افتح البوابات، اهزم الهاكر واستعيد الكنز 💎</p><input id="nm" placeholder="اكتب اسمك" maxlength="30"><button class="b" onclick="go()">ابدأ المغامرة ⚔️</button><p><small>الدرس السادس: Cloud Computing<br>5 مراحل • 3 قلوب • سكور • وقت لكل سؤال</small></p></div>`}
+function go(){const n=$('#nm').value.trim();if(!n){$('#nm').focus();return}S={name:n,lv:0,lives:3,score:0,streak:0,cor:0,tot:0,hint:2,skip:1,pool:sh(M),lock:0,msg:''};snd(500);intro()}
+function intro(){const l=LV[S.lv];A.innerHTML=hud()+`<div class="c ctr"><div class="big">${l.e}</div><h2>المرحلة ${S.lv+1}: ${l.n}</h2><p>${S.msg}</p><p>${l.s}</p><button class="b" onclick="run()">يلا! 🚀</button></div>`;S.msg=''}
+function run(){const L=S.lv,m=x=>({t:'m',q:x[0],a:x[1],o:x.slice(1)});S.i=0;
+if(L==0)S.q=S.pool.slice(0,5).map(m);
+if(L==1)S.q=sh(TF).slice(0,7).map(x=>({t:'t',q:x[0],a:x[1]}));
+if(L==2)S.q=sh(SO).slice(0,8).map(x=>({t:'s',q:x[0],a:x[1]}));
+if(L==4){S.q=S.pool.slice(5,11).map(m);S.hp=S.q.length}
+nxt()}
+function nxt(){clearInterval(tm);if(S.lv==3)return ord();if(S.i>=S.q.length)return done();const q=S.q[S.i];S.tl=q.t=='m'?(S.lv==4?15:20):q.t=='t'?12:10;S.t0=Date.now();draw(q);tick()}
+function draw(q){let o='',g='';
+if(q.t=='m')o=sh(q.o).map(x=>`<button class="o" data-r="${x===q.a?1:0}" onclick="pk(this)">${x}</button>`).join('');
+if(q.t=='t'){g=' g2';o=[['✅ صح',1],['❌ غلط',0]].map(x=>`<button class="o" data-r="${x[1]==q.a?1:0}" onclick="pk(this)">${x[0]}</button>`).join('')}
+if(q.t=='s'){g=' g2';o=C.map((x,i)=>`<button class="o" data-r="${i==q.a?1:0}" onclick="pk(this)">${x}</button>`).join('')}
+const v=S.lv==4?`<div class="vil">👾<div class="hp"><b style="width:${S.hp/S.q.length*100}%"></b></div></div>`:'';
+A.innerHTML=hud()+`<div class="c">${v}<div class="tb"><b id="tb"></b></div><div class="qc ${q.t=='s'?'s':''}">${q.q}</div>${q.t=='s'?'<p class="ctr">الخدمة دي بتتبع أنهي مجال؟</p>':''}<div class="og${g}">${o}</div><div class="pw">${q.t=='m'?`<button onclick="fifty()">✂️ 50/50 (<b id="hc">${S.hint}</b>)</button>`:''}<button onclick="skip()">⏭ تخطي (${S.skip})</button></div></div>`}
+function tick(){const b=$('#tb');tm=setInterval(()=>{const l=S.tl-(Date.now()-S.t0)/1000;b.style.width=Math.max(l/S.tl*100,0)+'%';if(l<=0&&!S.lock){S.lock=1;clearInterval(tm);S.tot++;rev();miss();adv()}},100)}
+function rev(){document.querySelectorAll('.o').forEach(b=>b.dataset.r=='1'&&b.classList.add('ok'))}
+function adv(){setTimeout(()=>{S.lock=0;S.i++;S.lives<1?fin(0):nxt()},1000)}
+function miss(){S.lives--;S.streak=0;no();A.firstChild.classList.add('shake');A.firstChild.querySelector('span').textContent='❤️'.repeat(Math.max(S.lives,0))+'🖤'.repeat(3-Math.max(S.lives,0))}
+function pk(el){if(S.lock)return;S.lock=1;clearInterval(tm);S.tot++;
+if(el.dataset.r=='1'){S.cor++;S.streak++;const sec=Math.max(0,Math.round(S.tl-(Date.now()-S.t0)/1000));S.score+=100+sec*5+Math.min(S.streak,5)*10;el.classList.add('ok');ok();if(S.lv==4){S.hp--;$('.hp b').style.width=S.hp/S.q.length*100+'%'}}
+else{el.classList.add('bad');rev();miss()}
+adv()}
+function fifty(){if(S.hint<1||S.lock)return;S.hint--;$('#hc').textContent=S.hint;sh([...document.querySelectorAll('.o')].filter(b=>b.dataset.r!='1')).slice(0,2).forEach(b=>b.disabled=1)}
+function skip(){if(S.skip<1||S.lock)return;S.skip--;S.i++;nxt()}
+function ord(){S.k=0;S.o=sh(ST.map((s,i)=>[s,i]));drawO()}
+function drawO(){A.innerHTML=hud()+`<div class="c"><h2>${LV[3].n}</h2><p>اضغط الخطوات بالترتيب الصح: من أول خطوة لآخر خطوة 👇</p><div class="og">${S.o.map(([s,i])=>`<button class="o ${i<S.k?'ok':''}" ${i<S.k?'disabled':''} onclick="po(this,${i})">${i<S.k?(i+1)+'. ':''}${s}</button>`).join('')}</div></div>`}
+function po(el,i){if(S.lock)return;S.tot++;
+if(i==S.k){S.k++;S.cor++;S.streak++;S.score+=60;ok();drawO();if(S.k==ST.length){S.lock=1;setTimeout(()=>{S.lock=0;done()},800)}}
+else{S.lock=1;el.classList.add('bad');miss();setTimeout(()=>{S.lock=0;S.lives<1?fin(0):drawO()},600)}}
+function done(){clearInterval(tm);const b=S.lives*50;S.score+=b;S.lv++;if(S.lv>4)return fin(1);S.msg=`🎉 عديت المرحلة! بونص القلوب +${b}`;snd(784,.3);intro()}
+function conf(){for(let i=0;i<30;i++){const s=document.createElement('span');s.className='cf';s.textContent=['🎉','💎','⭐','👑','🪙'][i%5];s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),5000)}}
+function fin(w){clearInterval(tm);const p=S.tot?S.cor/S.tot:0,st=w?(p>.85?3:p>.65?2:1):0;
+const lvl=w?5:S.lv+1;
+const msg=`🏰 قلعة السحاب – Cloud Computing (الدرس 6)\nالاسم: ${S.name}\nالنتيجة: ${w?'هزم الهاكر واستعاد الكنز 💎':'وقف عند المرحلة '+lvl+' من 5'}\nالسكور: ${S.score}\nإجابات صح: ${S.cor} من ${S.tot}\nالنجوم: ${st?'⭐'.repeat(st):'0'}`;
+A.innerHTML=`<div class="c ctr"><div class="big">${w?'💎👑':'💀'}</div><h1>${w?'مبروك يا بطل! استعدت الكنز':'الهاكر كسب الجولة دي!'}</h1><div class="st">${'⭐'.repeat(st)}</div><p class="sc">${S.score}</p><p>${S.name} • صح ${S.cor} من ${S.tot} • المرحلة ${lvl}/5</p><a class="b wa" target="_blank" rel="noopener" href="https://wa.me/201007243344?text=${encodeURIComponent(msg)}">📲 ابعت السكور على واتساب</a><p><small>اضغط الزرار وبعدين دوس إرسال جوه واتساب</small></p><button class="b" onclick="home()">العب تاني 🔁</button></div>`;
+if(w){conf();snd(523,.2);setTimeout(()=>snd(784,.4),200)}else no()}
+home();
+</script>
+</body>
+</html>
